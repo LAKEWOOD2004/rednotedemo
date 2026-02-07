@@ -27,7 +27,7 @@ class HomeViewController: UIViewController {
         cv.dataSource = self //谁来提供数据
         cv.delegate = self //自己来处理交互
         //注册一种格子类型，之后写自定义的 NoteCell
-        cv.register(UICollectionView.self, forCellWithReuseIdentifier: "NoteCell")
+        cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "NoteCell")
         return cv
     }()
     
