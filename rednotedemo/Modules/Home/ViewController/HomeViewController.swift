@@ -10,7 +10,8 @@ import SnapKit
 
 class HomeViewController: UIViewController {
     
-    //1.定义顶部导航栏组件
+    //1.定义顶部导航栏组件和依赖
+    private let viewModel = HomeViewModel()
     private let headerView  = HomeHeaderView()
     
     //2.定义瀑布流列表
@@ -26,21 +27,24 @@ class HomeViewController: UIViewController {
         cv.backgroundColor = .systemGray6 //浅灰色背景
         cv.dataSource = self //谁来提供数据
         cv.delegate = self //自己来处理交互
-        //注册一种格子类型，之后写自定义的 NoteCell
-        cv.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "NoteCell")
+        //自定义的 NoteCell
+        cv.register(NoteCell.self, forCellWithReuseIdentifier: "NoteCell")
         return cv
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
-        
-        //隐藏系统默认的导航栏
-        navigationController?.setNavigationBarHidden(true, animated: false)
-        
         setupUI()
+        bindViewModel() //核心：绑定
+        viewModel.requestData() //和兴：让 VM 去干活
     }
-        
+    
+    private func creatWaterfallLayout() -> UICollectionViewLayout {
+        return UICollectionViewCompositionalLayout {
+            
+        }
+    }
+    
     private func setupUI() {
         //添加顶部组件
         view.addSubview(headerView)
@@ -59,12 +63,20 @@ class HomeViewController: UIViewController {
             make.left.right.bottom.equalToSuperview()
         }
     }
+    
+    private func bindViewModel() {
+        //一旦数据好了，就刷新 UI
+        viewModel.reloadData = { [weak self] in
+            self?.collectionView.reloadData()
+        }
+    }
 }
 
+// MARK: -数据源
 extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     //告诉系统显示多少个笔记
     func collectionView(_ collection: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20 //暂时写死 20 个
+        return viewModel.numberOfItems
     }
     
     //询问每一个格子的具体内容
