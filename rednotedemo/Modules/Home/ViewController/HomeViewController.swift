@@ -17,12 +17,9 @@ class HomeViewController: UIViewController {
     //2.定义瀑布流列表
     private lazy var collectionView: UICollectionView = {
         //后续定义更复杂瀑布流
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 10
-        layout.minimumInteritemSpacing = 10
-        //设置左右边距
-        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        let layout = WaterfallLayout()
+        layout.delegate = self
+
         let cv = UICollectionView(frame: .zero,collectionViewLayout: layout)
         cv.backgroundColor = .systemGray6 //浅灰色背景
         cv.dataSource = self //谁来提供数据
@@ -39,12 +36,6 @@ class HomeViewController: UIViewController {
         viewModel.requestData() //和兴：让 VM 去干活
     }
     
-    private func creatWaterfallLayout() -> UICollectionViewLayout {
-        return UICollectionViewCompositionalLayout {
-            
-        }
-    }
-    
     private func setupUI() {
         //添加顶部组件
         view.addSubview(headerView)
@@ -52,9 +43,9 @@ class HomeViewController: UIViewController {
         view.addSubview(collectionView)
         
         headerView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            make.bottom.equalTo(view.safeAreaLayoutGuide.snp.top)
             make.left.right.equalToSuperview()
-            make.height.equalTo(44)
+            make.height.equalTo(50)
         }
         
         //列表撑满剩下所有空间
@@ -73,10 +64,11 @@ class HomeViewController: UIViewController {
 }
 
 // MARK: -数据源
-extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     //告诉系统显示多少个笔记
     func collectionView(_ collection: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel.numberOfItems
+        return 30
+        //return viewModel.numberOfItems
     }
     
     //询问每一个格子的具体内容
@@ -86,10 +78,11 @@ extension HomeViewController: UICollectionViewDataSource, UICollectionViewDelega
         cell.layer.cornerRadius = 8
         return cell
     }
-    
-    //询问每一个格子的长款尺寸
-    func collectionView(_collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (view.frame.width - 30) / 2 // 屏幕宽度扣除间距除以2
-        return CGSize(width: width, height: width * 1.3) // 暂时设个 1.3 倍的高
+}
+
+// 瀑布流布局代理：在这里决定高度
+extension HomeViewController: WaterfallLayoutDelegate {
+    func waterfallLayout(_ layout: WaterfallLayout, heightForItemAt indexPath: IndexPath) -> CGFloat {
+        return CGFloat.random(in: 180...320)
     }
 }
