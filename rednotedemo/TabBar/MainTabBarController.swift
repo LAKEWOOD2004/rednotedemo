@@ -1,63 +1,61 @@
-//
-//  MainTabBarController.swift
-//  rednotedemo
-//
-//  Created by LAKEWOOD on 2026/2/7.
-//
-
-import Foundation
 import UIKit
 
 class MainTabBarController: UITabBarController {
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //1.设置 tabbar 外观
         setupTabBarAppearance()
-        
-        //2.初始化所有子页面
         setupViewControllers()
     }
     
     private func setupTabBarAppearance() {
-        //设置背景颜色为白色
         tabBar.backgroundColor = .white
-        //设置选中图标的颜色
-        tabBar.tintColor = .xhsRed
-        //设置未选中的图标颜色
+        tabBar.tintColor = UIColor(red: 0.99, green: 0.17, blue: 0.33, alpha: 1.0) // xhsRed
         tabBar.unselectedItemTintColor = .gray
-        
-        tabBar.layer.shadowColor = UIColor.black.cgColor
-        tabBar.layer.shadowOpacity = 0.1
-        tabBar.layer.shadowOffset = CGSize(width: 0, height: -1)
-        tabBar.layer.shadowRadius = 3;
     }
     
     private func setupViewControllers() {
+        // 1. 首页 (已经完成瀑布流那个)
         let homeVC = createNavController(viewController: HomeViewController(),
-                                         title:"首页")
-        let shoppingVC = createNavController(viewController: UIViewController(),
-                                             title: "购物")
-        //发布页面比较特殊，先占个位
-        let postVC = createNavController(viewController: UIViewController(),
-                                         title: "")
-        let messageVC = createNavController(viewController: UIViewController(),
-                                            title: "消息")
-        let meVC = createNavController(viewController: UIViewController(),
-                                       title: "我")
+                                         title: "",
+                                         imageName: "sparkles",
+                                         selectedImageName: "sparkles")
         
-        //交给 TabBarCcontroller 管理
-        viewControllers = [homeVC, shoppingVC, postVC, messageVC, meVC]
+        // 2. 视频 (新改的)
+        let videoVC = createNavController(viewController: VideoViewController(),
+                                          title: "",
+                                          imageName: "play.rectangle.on.rectangle",
+                                          selectedImageName: "play.rectangle.on.rectangle.fill")
+        
+        // 3. 发布
+        let postVC = createNavController(viewController: UIViewController(),
+                                         title: "",
+                                         imageName: "plus.rectangle.fill",
+                                         selectedImageName: "plus.rectangle.fill")
+        
+        // 4. 消息
+        let messageVC = createNavController(viewController: UIViewController(),
+                                            title: "",
+                                            imageName: "bubble.left.and.bubble.right",
+                                            selectedImageName: "bubble.left.and.bubble.right.fill")
+        
+        // 5. 我
+        let meVC = createNavController(viewController: UIViewController(),
+                                       title: "",
+                                       imageName: "person",
+                                       selectedImageName: "person.fill")
+        
+        viewControllers = [homeVC, videoVC, postVC, messageVC, meVC]
     }
     
     private func createNavController(viewController: UIViewController,
-                                    title: String) -> UINavigationController {
+                                     title: String,
+                                     imageName: String,
+                                     selectedImageName: String) -> UINavigationController {
         viewController.tabBarItem.title = title
-        viewController.view.backgroundColor = .systemBackground
-        
-        //返回一个包装了该页面的导航控制器
+        viewController.tabBarItem.image = UIImage(systemName: imageName)
+        viewController.tabBarItem.selectedImage = UIImage(systemName: selectedImageName)
+        //viewController.view.backgroundColor = .systemBackground
         return UINavigationController(rootViewController: viewController)
     }
 }
-
