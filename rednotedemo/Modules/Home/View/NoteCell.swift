@@ -15,7 +15,7 @@ class NoteCell: UICollectionViewCell {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
-        iv.backgroundColor = .xhsRed
+        iv.backgroundColor = .systemGray6
         iv.layer.cornerRadius = 8
         iv.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         return iv
@@ -83,6 +83,14 @@ class NoteCell: UICollectionViewCell {
         contentView.addSubview(likeButton)
         
         coverImageView.snp.makeConstraints { make in
+            make.top.left.right.equalToSuperview()
+            // 注意：这里不要写死高度，高度由 WaterfallLayout 计算出来的 Cell 宽度和图片比例决定
+            // 我们只需要让它撑满顶部即可
+        }
+        
+        // 2. 标题：【关键修改】必须连接在封面图下方
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(coverImageView.snp.bottom).offset(8) // 连接处！
             make.left.equalToSuperview().offset(8)
             make.right.equalToSuperview().offset(-8)
         }
@@ -107,13 +115,19 @@ class NoteCell: UICollectionViewCell {
     }
     
     //MARK: -绑定数据
-//    func configure(with note:Note) {
-//        titleLabel.text = note.title
-//        authorLabel.text = note.userName
-//        likeButton.setTitle(note.likeCount, for: .normal)
-//        
-//        //网络请求来的
-//        coverImageView.image = UIImage()
-//    }
-    
+    func configure(with post:PostItem) {
+        titleLabel.text = post.title
+        authorLabel.text = post.author.nickname
+        likeButton.setTitle("\(post.likeCount)", for: .normal)
+        
+        //网络请求来的
+        let imageURL = "http://127.0.0.1:8000" + post.coverImage
+        coverImageView.loadImage(from: imageURL)
+
+        // 如果有作者头像也加载
+        if let avatar = post.author.avatar {
+            let avatarURL = "http://127.0.0.1:8000" + avatar
+            avatarImageView.loadImage(from: avatarURL)
+        }
+    }
 }
